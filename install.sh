@@ -95,10 +95,12 @@ cmd_init() {
   for f in PLAN.md RESULTS.md DECISIONS.md ARCHITECTURE.md PITCH.md check.sh \
            review/R1.md review/R2.md review/R3.md; do
     rel="$ws/$f"
-    if [ -e "$rel" ]; then warn "$rel exists"; else cp "$HERE/templates/$f" "$rel"; say "created $rel"; fi
+    if [ -e "$rel" ]; then warn "$rel exists"; else
+      cp "$HERE/templates/$f" "$rel"; say "created $rel"
+      [ "$f" = check.sh ] && chmod +x "$rel"
+    fi
   done
-  chmod +x "$ws/check.sh" 2>/dev/null || true
-  for f in "$ws/AGENTS.md" "$ws/AGENTS.override.md" "$ws/.codex/AGENTS.md" "$ws/CLAUDE.md"; do
+  for f in "$ws/AGENTS.md" "$ws/AGENTS.override.md" "$ws/.codex/AGENTS.md" "$ws/.codex/AGENTS.override.md" "$ws/CLAUDE.md"; do
     [ -e "$f" ] && { say "found existing instructions: $f  <- read this first"; existing=1; }
   done
   if [ -n "$existing" ]; then
@@ -106,7 +108,7 @@ cmd_init() {
     else cp "$HERE/templates/AGENTS.md" "$ws/AGENTS.append.md"; say "created $ws/AGENTS.append.md"; fi
     say "The existing instructions were left untouched. AGENTS.append.md is NOT applied: paste only the lines that do not conflict."
   else
-    cp "$HERE/templates/AGENTS.md" "$ws/AGENTS.md"; say "created $ws/AGENTS.md (no instructions file was there). Start a new session so it is read."
+    cp "$HERE/templates/AGENTS.md" "$ws/AGENTS.md"; say "created $ws/AGENTS.md (no instructions file in this folder; check for others the platform injects). Start a new session so it is read."
   fi
 }
 

@@ -4,7 +4,8 @@
 - **리뷰 실행**: 만든 세션과 **다른 세션**에서 읽기 전용으로.
   - 셸(세 리뷰어를 한꺼번에, 결과는 `review/R*.out.md`):
     ```
-    for r in R1 R2 R3; do codex exec -s read-only -o review/$r.out.md "기준 커밋은 <시작 커밋>이다. review/$r.md 를 읽고 그대로 검토해. 파일은 고치지 마." < /dev/null > /dev/null 2>&1 & done; wait
+    for r in R1 R2 R3; do codex exec -s read-only -o review/$r.out.md "기준 커밋은 <시작 커밋>이다. 그 커밋부터 지금까지의 변경(커밋 안 된 것 포함)을 review/$r.md 대로 검토해. 파일은 고치지 마." < /dev/null > review/$r.log 2>&1 & done; wait
+    for r in R1 R2 R3; do [ -s review/$r.out.md ] && echo "$r 완료" || echo "$r 실패 - review/$r.log 확인"; done
     ```
   - TUI: `/review` 뒤에 review/R1.md 내용을 붙인다. 세션을 못 나누면 같은 세션에서 역할만 바꿔 보낸다.
 - 지적은 그대로 받아들이지 않는다. 코드에서 사실인지 확인한 뒤 수용 · 기각을 정한다.

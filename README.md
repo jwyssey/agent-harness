@@ -10,6 +10,8 @@
 ```bash
 git clone https://github.com/jwyssey/agent-harness && cd agent-harness
 ./install.sh                      # 핵심 스킬 → ~/.codex/skills 와 ~/.claude/skills (이름으로 부를 때만 돈다)
+./install.sh --codex-only         # Codex 만 쓸 때
+./install.sh --project ~/workspace --codex-only   # 홈 폴더에 쓸 수 없을 때(워크스페이스의 .agents/skills)
 ./install.sh init ~/workspace     # PLAN.md 등 작업 파일 복사. AGENTS.md 는 없을 때만 만든다
 ./install.sh --with ui            # 과제를 읽은 뒤 필요한 묶음만 추가 (ml | ui | parallel | process | all)
 ./install.sh list                 # 무엇이 있고 무엇이 설치됐나
@@ -22,8 +24,8 @@ git clone https://github.com/jwyssey/agent-harness && cd agent-harness
 |---|---|---|
 | 지시 파일 | `AGENTS.md` (홈 `~/.codex/AGENTS.md` → 저장소 루트 → 현재 폴더 순으로 읽음) | `CLAUDE.md` (`@AGENTS.md` 한 줄을 적으면 같은 파일을 읽는다) |
 | 스킬 부르기 | `$grilling` 또는 `/skills` 에서 선택 | `/grilling` |
-| 사용자 단위 위치 | `~/.codex/skills/` (`~/.agents/skills/` 도 읽음) | `~/.claude/skills/` |
-| 프로젝트 단위 위치 | `<repo>/.agents/skills/` (`./install.sh --project <repo>`) | `<repo>/.claude/skills/` |
+| 사용자 단위 위치 | `$CODEX_HOME/skills/` (기본 `~/.codex/skills/`, `~/.agents/skills/` 도 읽음) | `~/.claude/skills/` |
+| 프로젝트 단위 위치 | `<repo>/.agents/skills/` (`./install.sh --project <repo>`) | `<repo>/.claude/skills/` (설치 스크립트는 지원하지 않음, 직접 복사) |
 
 ## 들어 있는 것
 
