@@ -45,8 +45,8 @@ explicit_only() {         # $1 = installed skill dir. The agent may run it only 
       printf 'policy:\n  allow_implicit_invocation: false\n' >> "$y"
     fi
   fi
-  # Claude Code. `grilling` stays callable by the model because `grill-me` delegates to it through the Skill tool.
-  if [ -f "$s" ] && [ "$(basename "$1")" != "grilling" ] && ! grep -q '^disable-model-invocation:' "$s"; then
+  # Claude Code
+  if [ -f "$s" ] && ! grep -q '^disable-model-invocation:' "$s"; then
     sed -i.bak '0,/^name:.*$/s//&\ndisable-model-invocation: true/' "$s" && rm -f "$s.bak"
   fi
 }

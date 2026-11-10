@@ -34,7 +34,7 @@ git clone https://github.com/jwyssey/agent-harness && cd agent-harness
 | [FALLBACK.md](FALLBACK.md) | 아무것도 가져올 수 없을 때 손으로 치는 여덟 줄과 스킬 대신 보내는 한 줄 |
 | `prompts/` | 빈칸을 채워 붙이는 프롬프트 10개(질문 설계 · KPI 사슬 · 설계 대화 · 평가 고정 · 인수 기준 · goal · 대조 · 추적 · 리뷰 통합 · 셀프 출제) |
 | `templates/` | 작업 파일 뼈대: PLAN · RESULTS · DECISIONS · ARCHITECTURE · PITCH · `check.sh` · `AGENTS.md` · 리뷰어 지시문 R1~R3 |
-| `skills/` | 기본으로 설치하는 스킬 6종(+ 별칭 1) |
+| `skills/` | 기본으로 설치하는 스킬 5종 |
 | `optional/` | 과제를 보고 켜는 스킬 묶음: `ml` · `ui` · `parallel` · `process` |
 | `third_party/` | 원저작자 라이선스 전문 |
 
@@ -44,7 +44,7 @@ Storey(2026)는 AI와 만든 소프트웨어의 빚을 기술 · 의도 · 인�
 
 | 무엇 | 묻는 것 | 사람이 하는 일 | 파일 · 프롬프트 | 스킬 |
 |---|---|---|---|---|
-| **의도** | 무엇을 왜 만드나 | 담당자에게 묻고, 목표와 만들지 않을 것을 고른다 | `PLAN.md` · `DECISIONS.md` · `prompts/01~06` | `grilling` · `to-questionnaire` · `define-goal` |
+| **의도** | 무엇을 왜 만드나 | 담당자에게 묻고, 목표와 만들지 않을 것을 고른다 | `PLAN.md` · `DECISIONS.md` · `prompts/01~06` | `grilling` · `define-goal` |
 | **기술** | 실제로 돌아가나 | 평가를 먼저 고정하고 대조표를 직접 확인한다 | `check.sh` · `RESULTS.md` · `review/R1~R3` · `prompts/04 · 07 · 09` | 없음(`AGENTS.md` 의 줄로 충분) |
 | **인지** | 내가 설명할 수 있나 | 요청 한 건의 흐름을 AI 없이 말하고, 발표와 답을 직접 한다 | `ARCHITECTURE.md` · `PITCH.md` · `prompts/08 · 10` | `learning-opportunities` · `pitch-prep` |
 
@@ -56,8 +56,7 @@ Storey(2026)는 AI와 만든 소프트웨어의 빚을 기술 · 의도 · 인�
 
 | 스킬 | 출처(★) | 하는 일 | 쓰는 때 |
 |---|---|---|---|
-| `grilling` (`grill-me`) | mattpocock/skills (319k) | 계획의 결정들을 선행 관계 순서로 한 라운드씩 캐묻고, 질문마다 추천 답을 붙인다 | KPI · 범위를 고른 직후 |
-| `to-questionnaire` | mattpocock/skills | 내가 답할 수 없는 것을 상대에게 물을 질문 문서로 만든다 | 담당자 질문 초안 |
+| `grilling` | mattpocock/skills (319k) | 계획의 결정들을 선행 관계 순서로 한 라운드씩 캐묻고, 질문마다 추천 답을 붙인다 | KPI · 범위를 고른 직후 |
 | `define-goal` | openai/skills (29k) | 흐린 목표를 결과 · 검증 방법 · 범위 · 멈출 조건이 있는 goal 로 다듬는다 | `/goal` 직전 |
 | `learning-opportunities` | DrCatHicks/learning-opportunities (2.5k) | 예측 → 관찰, 경로 따라가기 같은 짧은 연습으로 방금 만든 것을 이해하게 한다 | 마일스톤 직후 |
 | `handoff` | mattpocock/skills | 대화를 새 세션이 이어받을 문서로 줄인다 | 마일스톤 끝, 새 세션으로 넘어가기 전 |
@@ -76,13 +75,13 @@ Storey(2026)는 AI와 만든 소프트웨어의 빚을 기술 · 의도 · 인�
 | `ui` | `frontend-design` · `webapp-testing` | anthropics/skills (191k) | 웹 화면을 직접 만들 때 / Playwright 를 쓸 수 있을 때 |
 | `parallel` | `using-git-worktrees` · `dispatching-parallel-agents` | obra/superpowers (315k) | 서로 다른 가설 2개를 같은 평가로 동시에 볼 때 |
 | `process` | `verification-before-completion` · `receiving-code-review` · `systematic-debugging` | obra/superpowers | 쓰는 모델이 검증 · 원인 진단을 스스로 하지 않을 때 |
-| `process` | `karpathy-guidelines` | multica-ai/andrej-karpathy-skills (231k) | 쓰는 모델이 요구에 없는 코드를 자주 덧붙일 때 |
+| `process` | `to-questionnaire` | mattpocock/skills | 마주 앉아 물을 수 없어 질문 문서를 보내야 할 때 |
 
 ## 넣지 않은 것
 
 - **플러그인 통째 설치**(superpowers 전체, gstack, spec-kit 류): 세션 시작 훅과 정해진 작업 사슬이 따라와서, 제공된 환경의 지시문이나 짧은 시간표와 부딪힌다. 필요한 스킬만 낱개로 가져왔다.
 - **기능이 겹치는 큰 스킬**(brainstorming, interview-me 등): `grilling` 하나로 충분하고 지시문이 길수록 토큰을 더 쓴다.
-- **늘 켜 두는 절차 스킬**: 검증 · 디버깅 · 리뷰 수용 · 단순하게 쓰기는 기본 설치에서 뺐다. 최신 모델에서는 이런 지시가 중복이 되기 쉽고, 단계가 촘촘한 지시는 과제와 맞지 않을 때 오히려 결과를 나쁘게 한다. 같은 내용은 `AGENTS.md` 의 몇 줄과 FALLBACK 의 한 줄로 남겼다 → [GUIDE.md](GUIDE.md).
+- **늘 켜 두는 절차 스킬**: 검증 · 디버깅 · 리뷰 수용은 기본 설치에서 뺐다. 최신 모델에서는 이런 지시가 중복이 되기 쉽고, 단계가 촘촘한 지시는 과제와 맞지 않을 때 오히려 결과를 나쁘게 한다. 같은 내용은 `AGENTS.md` 의 몇 줄과 FALLBACK 의 한 줄로 남겼다 → [GUIDE.md](GUIDE.md).
 
 ## 스킬을 쓸 때 지킬 것
 
