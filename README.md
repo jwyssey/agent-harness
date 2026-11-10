@@ -62,7 +62,7 @@ Storey(2026)는 AI와 만든 소프트웨어의 빚을 기술 · 의도 · 인�
 | `grilling` | mattpocock/skills (319k) | 계획의 결정들을 선행 관계 순서로 한 라운드씩 캐묻고, 질문마다 추천 답을 붙인다 | KPI · 범위를 고른 직후 |
 | `define-goal` | openai/skills (29k) | 흐린 목표를 결과 · 검증 방법 · 범위 · 멈출 조건이 있는 goal 로 다듬는다 | `/goal` 직전 |
 | `learning-opportunities` | DrCatHicks/learning-opportunities (2.5k) | 예측 → 관찰, 경로 따라가기 같은 짧은 연습으로 방금 만든 것을 이해하게 한다 | 마일스톤 직후 |
-| `handoff` | mattpocock/skills | 대화를 새 세션이 이어받을 문서로 줄인다 | 마일스톤 끝, 새 세션으로 넘어가기 전 |
+| `handoff` | mattpocock/skills | 대화를 새 세션이 이어받을 문서로 줄인다 | 세션을 바꿀 때만(문맥이 찼거나 방향이 틀어졌을 때) |
 | `pitch-prep` | 이 저장소 | 작업 기록에서 발표 뼈대를 뽑고, 약한 지점부터 하나씩 물어 내 답을 파일과 대조한다. 대본은 쓰지 않는다 | 동결 직후 |
 
 **스킬은 이름으로 부를 때만 돈다.** 설치할 때 각 스킬에 자동 호출을 끄는 설정을 붙인다(Codex 는 `agents/openai.yaml` 의 `allow_implicit_invocation: false`, Claude Code 는 `disable-model-invocation: true`). 설명 문구만 보고 에이전트가 과제와 맞지 않는 절차를 끌어오는 일을 막기 위해서다. 원본의 자동 호출을 그대로 두려면 `./install.sh --auto`.
