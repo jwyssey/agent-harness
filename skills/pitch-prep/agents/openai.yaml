@@ -1,0 +1,5 @@
+interface:
+  display_name: "Pitch Prep"
+  short_description: "Draft a talk skeleton from work records, then quiz the presenter"
+policy:
+  allow_implicit_invocation: false

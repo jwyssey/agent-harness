@@ -1,15 +1,18 @@
 #!/usr/bin/env bash
 # agent-harness installer
 #   ./install.sh                      core skills -> Codex + Claude Code (user level)
-#   ./install.sh --with ml,ui         core + optional groups (ml | ui | parallel | all)
+#   ./install.sh --with ml,ui         core + optional groups (ml | ui | parallel | process | all)
 #   ./install.sh --project DIR        install into DIR/.agents/skills instead of the home folder
-#   ./install.sh init [DIR]           copy working files (PLAN.md ...) into a workspace, never overwriting
+#   ./install.sh --auto               keep upstream auto-invocation (default: skills run only when called by name)
+#   ./install.sh init [DIR]           copy working files (PLAN.md ...) into a workspace, never overwriting;
+#                                     writes AGENTS.md only when the workspace has none
 #   ./install.sh list                 show what is available / installed
 #   ./install.sh uninstall            remove only what this script installed
 set -euo pipefail
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 MARK=".agent-harness"
+AUTO=0
 CODEX_DIR="${CODEX_HOME:-$HOME/.codex}/skills"
 CLAUDE_DIR="$HOME/.claude/skills"
 
@@ -26,9 +29,26 @@ skill_dirs() {            # $1 = comma separated optional groups
     elif [ -d "$HERE/optional/$g" ]; then
       find "$HERE/optional/$g" -mindepth 1 -maxdepth 1 -type d | sort
     else
-      warn "unknown group '$g' (ml | ui | parallel | all)"
+      warn "unknown group '$g' (ml | ui | parallel | process | all)"
     fi
   done
+}
+
+explicit_only() {         # $1 = installed skill dir. The agent may run it only when the user names it.
+  local y="$1/agents/openai.yaml" s="$1/SKILL.md"
+  if ! grep -qs 'allow_implicit_invocation' "$y"; then          # Codex
+    if grep -qs '^policy:' "$y"; then
+      warn "$y has a policy block; left as is"
+    else
+      mkdir -p "$1/agents"
+      [ -s "$y" ] && [ -n "$(tail -c1 "$y")" ] && echo >> "$y"
+      printf 'policy:\n  allow_implicit_invocation: false\n' >> "$y"
+    fi
+  fi
+  # Claude Code. `grilling` stays callable by the model because `grill-me` delegates to it through the Skill tool.
+  if [ -f "$s" ] && [ "$(basename "$1")" != "grilling" ] && ! grep -q '^disable-model-invocation:' "$s"; then
+    sed -i.bak '0,/^name:.*$/s//&\ndisable-model-invocation: true/' "$s" && rm -f "$s.bak"
+  fi
 }
 
 install_into() {          # $1 = target skills dir, $2 = groups
@@ -40,6 +60,7 @@ install_into() {          # $1 = target skills dir, $2 = groups
       warn "$dst already exists and is not ours"; continue
     fi
     rm -rf "$dst"; cp -R "$src" "$dst"; : > "$dst/$MARK"; n=$((n + 1))
+    [ "$AUTO" = 1 ] || explicit_only "$dst"
   done < <(skill_dirs "$2")
   say "installed $n skills -> $target"
 }
@@ -52,6 +73,7 @@ cmd_skills() {
       --project)     project="${2:-}"; shift 2 ;;
       --codex-only)  claude=0; shift ;;
       --claude-only) codex=0; shift ;;
+      --auto)        AUTO=1; shift ;;
       *) say "unknown option: $1"; exit 2 ;;
     esac
   done
@@ -63,22 +85,29 @@ cmd_skills() {
     [ "$claude" = 1 ] && install_into "$CLAUDE_DIR" "$groups"
   fi
   say "Codex: type \$skill-name or pick from /skills.  Claude Code: /skill-name."
+  [ "$AUTO" = 1 ] || say "Skills run only when you call them by name (use --auto to keep upstream auto-invocation)."
   say "Start a new session so the skill list is reloaded."
 }
 
 cmd_init() {
-  local ws="${1:-.}" f rel
+  local ws="${1:-.}" f rel existing=""
   mkdir -p "$ws/review"
-  for f in PLAN.md RESULTS.md DECISIONS.md ARCHITECTURE.md PITCH.md check.sh AGENTS.append.md \
+  for f in PLAN.md RESULTS.md DECISIONS.md ARCHITECTURE.md PITCH.md check.sh \
            review/R1.md review/R2.md review/R3.md; do
     rel="$ws/$f"
     if [ -e "$rel" ]; then warn "$rel exists"; else cp "$HERE/templates/$f" "$rel"; say "created $rel"; fi
   done
   chmod +x "$ws/check.sh" 2>/dev/null || true
-  for f in "$ws/AGENTS.md" "$ws/.codex/AGENTS.md" "$ws/CLAUDE.md"; do
-    [ -e "$f" ] && say "found existing instructions: $f  <- read this first"
+  for f in "$ws/AGENTS.md" "$ws/AGENTS.override.md" "$ws/.codex/AGENTS.md" "$ws/CLAUDE.md"; do
+    [ -e "$f" ] && { say "found existing instructions: $f  <- read this first"; existing=1; }
   done
-  say "AGENTS.append.md is NOT applied automatically. Read the existing instructions, then paste only the lines you want."
+  if [ -n "$existing" ]; then
+    if [ -e "$ws/AGENTS.append.md" ]; then warn "$ws/AGENTS.append.md exists"
+    else cp "$HERE/templates/AGENTS.md" "$ws/AGENTS.append.md"; say "created $ws/AGENTS.append.md"; fi
+    say "The existing instructions were left untouched. AGENTS.append.md is NOT applied: paste only the lines that do not conflict."
+  else
+    cp "$HERE/templates/AGENTS.md" "$ws/AGENTS.md"; say "created $ws/AGENTS.md (no instructions file was there). Start a new session so it is read."
+  fi
 }
 
 cmd_list() {
@@ -107,7 +136,7 @@ case "${1:-skills}" in
   list)      cmd_list ;;
   uninstall) shift; cmd_uninstall "$@" ;;
   skills)    shift || true; cmd_skills "$@" ;;
-  -h|--help) sed -n '2,8p' "$0" | sed 's/^# \{0,1\}//' ;;
+  -h|--help) sed -n '2,10p' "$0" | sed 's/^# \{0,1\}//' ;;
   --*)       cmd_skills "$@" ;;
   *)         say "unknown command: $1"; exit 2 ;;
 esac
