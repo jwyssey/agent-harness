@@ -34,6 +34,7 @@ git clone https://github.com/jwyssey/agent-harness && cd agent-harness
 | [RUNBOOK.md](RUNBOOK.md) | 시간표. 단계마다 부를 것 · 손으로 할 것 · 남길 것 |
 | [GUIDE.md](GUIDE.md) | 왜 이렇게 짰나. 근거가 된 연구와 글, 스킬을 고른 기준 |
 | [FALLBACK.md](FALLBACK.md) | 아무것도 가져올 수 없을 때 손으로 치는 여덟 줄과 스킬 대신 보내는 한 줄 |
+| [practice/](practice/) | 기본 흐름과 따로 둔 연습 자료. 표 · 센서 데이터의 상황별 대응과 푸는 예 |
 | `prompts/` | 빈칸을 채워 붙이는 프롬프트 10개(질문 설계 · KPI 사슬 · 설계 대화 · 평가 고정 · 인수 기준 · goal · 대조 · 추적 · 리뷰 통합 · 셀프 출제) |
 | `templates/` | 작업 파일 뼈대: PLAN · RESULTS · DECISIONS · ARCHITECTURE · PITCH · `check.sh` · `AGENTS.md` · 리뷰어 지시문 R1~R3 |
 | `skills/` | 기본으로 설치하는 스킬 5종 |
